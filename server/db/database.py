@@ -1,7 +1,10 @@
+# server/db/database.py
+
 from databases import Database
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, schema, Boolean
+from server.core.config import settings
 
-DB_URL = "postgresql://ruzhang:RZcp1207@localhost/job"
+DB_URL = settings.DB_URL
 
 database = Database(DB_URL)
 metadata = MetaData()
@@ -20,7 +23,7 @@ jobs = Table(
     Column("b_apply", Boolean),
     Column("s_time", String, index=True),
     Column("s_tag", String, index=True),
+    schema='public'
 )
 
-engine = create_engine(DB_URL)
 metadata.create_all(engine)
