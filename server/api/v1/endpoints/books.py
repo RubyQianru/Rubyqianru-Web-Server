@@ -1,8 +1,8 @@
 # app/api/v1/endpoints/books.py
 from fastapi import APIRouter, Depends
 from typing import List
-from server.schemas.book import BookCreate, BookResponse
-from server.db.database import database, books
+from ....schemas.book import BookCreate, BookResponse
+from ....db.database import database, books
 
 router = APIRouter()
 
