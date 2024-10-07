@@ -1,6 +1,6 @@
 # app/api/v1/api.py
 from fastapi import APIRouter
-from .endpoints import books
+from .endpoints import jobs
 
 api_router = APIRouter()
-api_router.include_router(books.router, prefix="/books", tags=["books"])
+api_router.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
