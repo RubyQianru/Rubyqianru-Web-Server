@@ -1,25 +1,31 @@
 # app/api/v1/endpoints/books.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from typing import List
 from ....schemas.job import JobCreate, JobResponse
-from ....db.database import database, jobs
+from ....db.database import database
+import uuid
 
 router = APIRouter()
 
 @router.post("/", response_model=JobResponse)
 async def create_book(job: JobCreate):
-    query = jobs.insert().values(
-        title=job.title, 
-        author=job.author, 
-        price=job.price
-        )
-    last_job_id = await database.execute(query)
-
-    query = jobs.select().where(jobs.c.id == last_job_id)
-    inserted = await database.fetch_one(query)
+    query = """
+    INSERT INTO jobs (s_id, s_title, s_company, s_url, b_apply, s_tag, s_time)
+    VALUES (:s_id, :s_title, :s_company, :s_url, :b_apply, :s_tag, NOW())
+    RETURNING s_id, s_title, s_company, s_url, b_apply, s_tag, s_time
+    """
+    values = {
+        "s_id": str(uuid.uuid4()),
+        "s_title": job.s_title, 
+        "s_company": job.s_company,
+        "s_url": job.s_url,
+        "b_apply": job.b_apply,
+        "s_tag": job.s_tag
+    }
+    inserted = await database.fetch_one(query=query, values=values)
     return inserted
 
 @router.get("/", response_model=List[JobResponse])
 async def get_books():
-    query = jobs.select()
-    return await database.fetch_all(query)
+    query = "SELECT s_id, s_title, s_company, s_url, b_apply, s_tag, s_time FROM jobs"
+    return await database.fetch_all(query=query)
