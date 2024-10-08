@@ -8,7 +8,7 @@ import uuid
 router = APIRouter()
 
 @router.post("/", response_model=JobResponse)
-async def create_book(job: JobCreate):
+async def create_job(job: JobCreate):
     query = """
     INSERT INTO jobs (s_id, s_title, s_company, s_url, b_apply, s_tag, s_time)
     VALUES (:s_id, :s_title, :s_company, :s_url, :b_apply, :s_tag, NOW())
@@ -26,6 +26,6 @@ async def create_book(job: JobCreate):
     return inserted
 
 @router.get("/", response_model=List[JobResponse])
-async def get_books():
+async def get_job():
     query = "SELECT s_id, s_title, s_company, s_url, b_apply, s_tag, s_time FROM jobs"
     return await database.fetch_all(query=query)
