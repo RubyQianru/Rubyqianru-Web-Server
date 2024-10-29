@@ -1,7 +1,6 @@
 server/db/database.py
 server/core/config.py
 server/api/v1/__pycache__/api.cpython-312.pyc
-server/api/v1/__pycache__/api.cpython-312.pyc
 server/api/v1/endpoints/__pycache__/github.cpython-312.pyc
 server/api/v1/endpoints/__pycache__/jobs.cpython-312.pyc
 server/core/__pycache__/__init__.cpython-312.pyc
