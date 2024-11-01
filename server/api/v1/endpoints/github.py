@@ -9,9 +9,9 @@ router = APIRouter()
 @router.post("/", response_model=GithubResponse)
 async def insert_github(item: GithubCreate):
     query = """
-    INSERT INTO github (s_id, s_title, s_full_name, s_desc, s_url, b_forl, s_created_at, s_updated_at)
-    VALUES (:s_id, :s_title, :s_full_name, :s_desc, :s_url, :b_forl, :s_created_at, :s_updated_at)
-    RETURNING s_id, s_title, s_full_name, s_desc, s_url, b_forl, s_created_at, s_updated_at
+    INSERT INTO github (s_id, s_title, s_full_name, s_desc, s_url, b_fork, s_created_at, s_updated_at)
+    VALUES (:s_id, :s_title, :s_full_name, :s_desc, :s_url, :b_fork, :s_created_at, :s_updated_at)
+    RETURNING s_id, s_title, s_full_name, s_desc, s_url, b_fork, s_created_at, s_updated_at
     """
 
     values = {
@@ -56,3 +56,14 @@ async def insert_github_bulk(items: List[GithubCreate]):
 
     inserted = await database.execute_many(query=query, values=values)
     return inserted
+
+
+@router.delete("/delete", response_model=List[GithubResponse])
+async def remove_repetition():
+    query = '''
+        DELETE FROM github t1
+        USING github t2
+        WHERE t1.s_id > t2.s_id 
+        AND t1.s_full_name = t2.s_full_name;
+        '''
+    return await database.fetch_all(query=query)

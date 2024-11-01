@@ -1,6 +1,6 @@
 # app/api/v1/api.py
 from fastapi import APIRouter
-from .endpoints import jobs, github, crypto
+from .endpoints import jobs, github, crypto, twitter
 
 v1_api_router = APIRouter()
 
@@ -23,7 +23,7 @@ v1_api_router.include_router(
   )
 
 v1_api_router.include_router(
-  crypto.router, 
+  twitter.router, 
   prefix="/twitter", 
   tags=["twitter"]
   )
