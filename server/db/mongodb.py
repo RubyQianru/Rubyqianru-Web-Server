@@ -11,3 +11,6 @@ crypto_collection = crypto_db["crypto"]
 twitter_db = client["twitter"]
 twitter_collection = twitter_db["twitter"]
 
+report_db = client["report"]
+report_collection = report_db["sentiment_report"]
+
