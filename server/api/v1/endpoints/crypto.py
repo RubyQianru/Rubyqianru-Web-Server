@@ -18,15 +18,53 @@ async def get_all_price_list(symbol: str = Query(default="BTC", description="Coi
          item['time'] = str(item['time'])
       if 'timestamp' in item:
          item['timestamp'] = str(item['timestamp'])
-    # print(cursor)
    return JSONResponse(content=cursor)
+
+
+# GET all available coins and their latest data
+@router.get("/coin_list")
+async def get_coin_list():
+   pipeline = [
+      {
+         "$group": {
+               "_id": "$symbol",
+               "latest_data": {"$last": "$$ROOT"}
+         }
+      },
+      {
+         "$project": {
+               "symbol": "$_id",
+               "name": "$latest_data.name",
+               "price": "$latest_data.price",
+               "dayHigh": "$latest_data.dayHigh",
+               "dayLow": "$latest_data.dayLow",
+               "open": "$latest_data.open",
+               "volume": "$latest_data.volume",
+               "time": "$latest_data.time",
+               "_id": 0
+         }
+      },
+      {
+         "$sort": {"volume": -1}
+      }
+   ]
+
+   data = list(crypto_collection.aggregate(pipeline))
+
+   for item in data:
+      if 'time' in item:
+         item['time'] = item['time'].isoformat() + 'Z'
+      if 'timestamp' in item:
+         item['timestamp'] = str(item['timestamp'])
+
+   return JSONResponse(content=data)
 
 
 # GET crypto data from the last n days
 @router.get("/days")
 async def get_price_list_by_days(
    symbol: str = Query(default="BTC", description="Coin symbol"),
-   days: int = Query(default=None, description="Number of days to fetch data for")
+   days: int = Query(default=7, description="Number of days to fetch data for")
    ):
 
    query = {"symbol": symbol}
@@ -38,7 +76,7 @@ async def get_price_list_by_days(
          "$lte": end_date
       }
    
-   data = list(crypto_collection.find(query).sort('timestamp', -1))
+   data = list(crypto_collection.find(query).sort('timestamp', 1))
    for item in data:
       item["_id"] = str(item["_id"])
       if 'time' in item:
@@ -81,15 +119,13 @@ async def get_weekly_summary(symbol: str = Query(default="BTC", description="Coi
       }
    ]
 
-   results = list(crypto_collection.aggregate(pipeline))
+   data = list(crypto_collection.aggregate(pipeline))
 
-   for result in results:
-      for entry in [result['first_data'], result['last_data']]:
-         entry["_id"] = str(entry["_id"])
-         entry['time'] = entry['time'].isoformat() + 'Z'
-         if 'timestamp' in entry:
-               entry['timestamp'] = str(entry['timestamp'])
+   for item in data:
+      item["_id"] = str(item["_id"])
+      if 'time' in item:
+         item['time'] = item['time'].isoformat() + 'Z'
+      if 'timestamp' in item:
+         item['timestamp'] = str(item['timestamp'])
 
-      result['date'] = result.pop('_id')
-
-   return JSONResponse(content=results)
+   return JSONResponse(content=data)
