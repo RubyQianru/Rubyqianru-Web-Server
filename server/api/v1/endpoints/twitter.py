@@ -24,7 +24,7 @@ async def get_twitter_list(
          "$lte": end_date
       }
 
-   data = list(twitter_collection.find(query).sort('timestamp', 1)) 
+   data = list(twitter_collection.find(query).sort('time', -1))
    for item in data:
       item["_id"] = str(item["_id"])
       if 'time' in item:
